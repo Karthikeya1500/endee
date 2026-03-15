@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+sentence-transformers
+langchain
+langchain-community
+langchain-text-splitters
+pypdf
+numpy
+requests
+msgpack
+streamlit
+python-multipart
+transformers
