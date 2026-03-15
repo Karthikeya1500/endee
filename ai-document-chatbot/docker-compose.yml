@@ -1,0 +1,76 @@
+services:
+  # ------------------------------------------------------------------
+  # Endee Vector Database
+  # ------------------------------------------------------------------
+  endee:
+    image: endee-oss:latest
+    container_name: chatbot-endee
+    environment:
+      NDD_NUM_THREADS: 0
+      NDD_AUTH_TOKEN: "${NDD_AUTH_TOKEN:-}"
+    volumes:
+      - endee-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
+    restart: unless-stopped
+
+  # ------------------------------------------------------------------
+  # FastAPI Backend (RAG pipeline)
+  # ------------------------------------------------------------------
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: chatbot-backend
+    command: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "8000:8000"
+    environment:
+      ENDEE_URL: "http://endee:8080"
+      GROQ_API_KEY: "${GROQ_API_KEY:-}"
+      GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
+    depends_on:
+      endee:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 15s
+      timeout: 5s
+      start_period: 60s
+      retries: 5
+    restart: unless-stopped
+
+  # ------------------------------------------------------------------
+  # Streamlit Frontend
+  # ------------------------------------------------------------------
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: chatbot-frontend
+    command: >
+      streamlit run frontend.py
+      --server.port=8501
+      --server.address=0.0.0.0
+      --server.headless=true
+    ports:
+      - "8501:8501"
+    environment:
+      API_URL: "http://backend:8000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 15s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+    restart: unless-stopped
+
+volumes:
+  endee-data:

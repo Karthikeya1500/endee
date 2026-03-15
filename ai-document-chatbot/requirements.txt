@@ -11,3 +11,5 @@ msgpack
 streamlit
 python-multipart
 transformers
+pymupdf
+google-genai

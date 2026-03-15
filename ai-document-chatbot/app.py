@@ -97,7 +97,8 @@ print("Local LLM loaded.")
 # ------------------------------------------------------------------
 # Endee vector store client
 # ------------------------------------------------------------------
-vector_store = EndeeVectorStore(base_url="http://localhost:8080")
+ENDEE_BASE_URL = os.environ.get("ENDEE_URL", "http://localhost:8080")
+vector_store = EndeeVectorStore(base_url=ENDEE_BASE_URL)
 INDEX_NAME = "documents"
 TOP_K = 5
 

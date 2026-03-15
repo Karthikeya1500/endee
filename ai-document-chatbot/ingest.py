@@ -48,7 +48,7 @@ from vector_store import EndeeVectorStore
 # ------------------------------------------------------------------
 PDF_PATH = os.path.join("documents", "sample.pdf")
 INDEX_NAME = "documents"
-ENDEE_URL = "http://localhost:8080"
+ENDEE_URL = os.environ.get("ENDEE_URL", "http://localhost:8080")
 
 # Embedding model: all-MiniLM-L6-v2
 # - Produces 384-dimensional vectors

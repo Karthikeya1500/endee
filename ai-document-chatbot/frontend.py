@@ -7,11 +7,12 @@ Users can upload a PDF document and then ask questions about it.
 
 import streamlit as st
 import requests
+import os
 
 # ------------------------------------------------------------------
 # Configuration
 # ------------------------------------------------------------------
-API_URL = "http://localhost:8000"
+API_URL = os.environ.get("API_URL", "http://localhost:8000")
 
 # ------------------------------------------------------------------
 # Page setup
